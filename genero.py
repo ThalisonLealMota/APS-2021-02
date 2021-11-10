@@ -13,7 +13,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # carregando modelos
-model_humor = load_model('emotion_detection')
+model_humor = load_model('emotion_detection.h5')
 model_genero = load_model('gender_detection.model')
 
 # abrindo webcam
