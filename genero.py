@@ -1,13 +1,8 @@
 #importando bibliotecas
 from keras.preprocessing.image import img_to_array
-from tensorflow.keras.models import Sequential, load_model
-from tensorflow.keras.layers import Dense, Dropout, Flatten
-from tensorflow.keras.layers import Conv2D
-from tensorflow.keras.layers import MaxPooling2D
+from tensorflow.keras.models import load_model
 import numpy as np
-import argparse
 import cv2
-import os
 import cvlib as cv
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
@@ -22,10 +17,10 @@ webcam = cv2.VideoCapture(0)
 if not webcam.isOpened():
     print("Could not open webcam")
     exit()
-    
+
+# labels de classificação
 classes = ['Homem','Mulher']
 emotion_dict = {0: "Raiva", 1: "Nojo", 2: "Medo", 3: "Feliz", 4: "Neutro", 5: "Triste", 6: "Surpreso"}
-
 
 # loop pelos frames
 while webcam.isOpened():
