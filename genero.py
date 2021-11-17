@@ -19,7 +19,7 @@ if not webcam.isOpened():
     exit()
 
 # labels de classificação
-classes = ['Homem','Mulher']
+classes = ['Masculino','Feminino']
 emotion_dict = {0: "Raiva", 1: "Nojo", 2: "Medo", 3: "Feliz", 4: "Neutro", 5: "Triste", 6: "Surpreso"}
 
 # loop pelos frames
@@ -57,16 +57,13 @@ while webcam.isOpened():
         # pre processamento para a detecção de genero e humor
         roi_gray = cv2.cvtColor(face_crop, cv2.COLOR_BGR2GRAY)
 
-        
         face_crop = cv2.resize(face_crop, (96,96))
         face_crop = face_crop.astype("float") / 255.0
         face_crop = img_to_array(face_crop)
         face_crop = np.expand_dims(face_crop, axis=0)
-
         
         cropped_img = np.expand_dims(np.expand_dims(cv2.resize(roi_gray, (48, 48)), -1), 0)
         
-
         # aplica detecçoes a face
         conf = model_genero.predict(face_crop)[0]
         prediction = model_humor.predict(cropped_img)[0]
@@ -80,10 +77,10 @@ while webcam.isOpened():
         h_label = "Emocao: {} ".format(h_label)
 
         # escreve a label abaixo do retangulo
-        cv2.putText(frame, g_label, (startX, endY + 20),  cv2.FONT_HERSHEY_SIMPLEX,
-                    0.6, (255, 255, 255), 2)
-        cv2.putText(frame, h_label, (startX, endY+40), cv2.FONT_HERSHEY_SIMPLEX,
-                     0.6, (255, 255, 255), 2)
+        cv2.putText(frame, g_label, (startX, startY - 20),  cv2.FONT_HERSHEY_SIMPLEX,
+                    0.6, (0, 0, 255), 2)
+        cv2.putText(frame, h_label, (startX, startY - 40), cv2.FONT_HERSHEY_SIMPLEX,
+                     0.6, (0, 0, 255), 2)
 
     # mostra o frame
     cv2.imshow("gender detection", frame)
