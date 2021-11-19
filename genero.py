@@ -1,5 +1,5 @@
 #importando bibliotecas
-from keras.preprocessing.image import img_to_array
+from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.models import load_model
 import numpy as np
 import cv2
@@ -15,7 +15,7 @@ model_genero = load_model('gender_detection.model')
 webcam = cv2.VideoCapture(0)
 
 if not webcam.isOpened():
-    print("Could not open webcam")
+    print("Não consegue abrir a webcam")
     exit()
 
 # labels de classificação
@@ -29,61 +29,58 @@ while webcam.isOpened():
     status, frame = webcam.read()
 
     if not status:
-        print("Could not read frame")
+        print("Não consegue ler o frame")
         exit()
 
     # aplica face detection
-    face, confidence = cv.detect_face(frame)
-
-    print(face)
-    print(confidence)
+    face, confianca = cv.detect_face(frame)
 
     # loop pelos rostos detectados
     for idx, f in enumerate(face):
 
         # pega os pontos do retangulo da face detectada       
-        (startX, startY) = f[0], f[1]
-        (endX, endY) = f[2], f[3]
+        (comecoX, comecoY) = f[0], f[1]
+        (fimX, fimY) = f[2], f[3]
 
         # desenha o retangulo sobre a face detectada
-        cv2.rectangle(frame, (startX,startY), (endX,endY), (0,255,0), 2)
+        cv2.rectangle(frame, (comecoX,comecoY), (fimX,fimY), (0,255,0), 2)
 
         # corta a parte detectada
-        face_crop = np.copy(frame[startY:endY,startX:endX])
+        face_crop = np.copy(frame[comecoY:fimY,comecoX:fimX])
 
         if (face_crop.shape[0]) < 10 or (face_crop.shape[1]) < 10:
             continue
 
         # pre processamento para a detecção de genero e humor
-        roi_gray = cv2.cvtColor(face_crop, cv2.COLOR_BGR2GRAY)
+        gray_crop = cv2.cvtColor(face_crop, cv2.COLOR_BGR2GRAY)
 
         face_crop = cv2.resize(face_crop, (96,96))
         face_crop = face_crop.astype("float") / 255.0
         face_crop = img_to_array(face_crop)
         face_crop = np.expand_dims(face_crop, axis=0)
         
-        cropped_img = np.expand_dims(np.expand_dims(cv2.resize(roi_gray, (48, 48)), -1), 0)
+        cropped_img = np.expand_dims(np.expand_dims(cv2.resize(gray_crop, (48, 48)), -1), 0)
         
         # aplica detecçoes a face
         conf = model_genero.predict(face_crop)[0]
         prediction = model_humor.predict(cropped_img)[0]
 
         # pega a label com maior valor
-        g_idx = np.argmax(conf)
-        h_idx = np.argmax(prediction)
-        g_label = classes[g_idx]
-        h_label = emotion_dict[h_idx]
-        g_label = "Genero: {} ({:.2f})".format(g_label, conf[g_idx] )
-        h_label = "Emocao: {} ".format(h_label)
+        gender_idx = np.argmax(conf)
+        humor_idx = np.argmax(prediction)
+        gender_label = classes[gender_idx]
+        humor_label = emotion_dict[humor_idx]
+        gender_label = "Genero: {} ({:.2f})".format(gender_label, conf[gender_idx] )
+        humor_label = "Emocao: {} ".format(humor_label)
 
         # escreve a label abaixo do retangulo
-        cv2.putText(frame, g_label, (startX, startY - 20),  cv2.FONT_HERSHEY_SIMPLEX,
+        cv2.putText(frame, gender_label, (comecoX, comecoY - 20),  cv2.FONT_HERSHEY_SIMPLEX,
                     0.6, (0, 0, 255), 2)
-        cv2.putText(frame, h_label, (startX, startY - 40), cv2.FONT_HERSHEY_SIMPLEX,
+        cv2.putText(frame, humor_label, (comecoX, comecoY - 40), cv2.FONT_HERSHEY_SIMPLEX,
                      0.6, (0, 0, 255), 2)
 
     # mostra o frame
-    cv2.imshow("gender detection", frame)
+    cv2.imshow("Detecção", frame)
 
     # pressione "Q" para sair
     if cv2.waitKey(1) & 0xFF == ord('q'):
